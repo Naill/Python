@@ -1,6 +1,7 @@
 #---------------------------------------
 #           Program by Dmitriy Penkrat
 #
+#
 #  Version      Date        Info
 #   1.0         04.2019     learn python
 #---------------------------------------
@@ -86,9 +87,9 @@ FOLDERS = ["/var/www/clients/client2/web22/web/eshop/admin/DEBUG",
             "/var/www/clients/client2/web45/web/eshop_old/admin/FILES",
             "/var/www/clients/client2/web46/web/eshop/admin/FILES"
            ]
-TOTAL_DELETED_FILE   = 0            #Общее количество удаленных файлов
-TOTAL_DELETED_FOLDER = 0            #Общее количество удаленных папок
-TOTAL_DELETED_SIZE   = 0            #Размер удаленных файлов
+TOTAL_DELETED_FILE   = 0            # Общее количество удаленных файлов
+TOTAL_DELETED_FOLDER = 0            # Общее количество удаленных папок
+TOTAL_DELETED_SIZE   = 0            # Размер удаленных файлов
 
 dirsFile = "dirs"                   #Файл с информацией о директориях для очистки мусора
 nowTime = time.time()               #Получение текущего времени в секундах
@@ -101,7 +102,7 @@ def Delete_Files(folder):
     global TOTAL_DELETED_FILE
     global TOTAL_DELETED_SIZE
     nameFile = 'removed.log'
-    logFile = open(nameFile, mode='w', encoding='utf-8')
+    logFile = open(nameFile, mode='a', encoding='utf-8')
     for path, dirs, files in os.walk(folder):
         for file in files:
             fileName = os.path.join(path, file) # Получение полного пути к файлу с указанием имени файла
@@ -112,7 +113,7 @@ def Delete_Files(folder):
                     sizeFile = os.path.getsize(fileName)
                     TOTAL_DELETED_SIZE += sizeFile # подсчитать размер удаленных файлов
                     TOTAL_DELETED_FILE += 1        # Подсчитать количество удаленных файлов
-                    #os.remove(fileName)
+                     #os.remove(fileName)
     logFile.close()
 
 #=================MAIN====================
