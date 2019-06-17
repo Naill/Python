@@ -8,9 +8,9 @@
 
 import os
 import time
-import clean_mail
+import mailsend
 
-DAYS = 2
+DAYS = 1
 FOLDERS = ["/var/www/clients/client2/web22/web/eshop/admin/DEBUG",
             "/var/www/clients/client2/web20/web/eshop/admin/DEBUG",
             "/var/www/clients/client2/web42/web/eshop/admin/DEBUG",
@@ -85,7 +85,8 @@ FOLDERS = ["/var/www/clients/client2/web22/web/eshop/admin/DEBUG",
             "/var/www/clients/client2/web13/web/eshop/admin/FILES",
             "/var/www/clients/client2/web45/web/eshop/admin/FILES",
             "/var/www/clients/client2/web45/web/eshop_old/admin/FILES",
-            "/var/www/clients/client2/web46/web/eshop/admin/FILES"
+            "/var/www/clients/client2/web46/web/eshop/admin/FILES",
+           "/var/www/phbase.apt.by/web/out/"
            ]
 TOTAL_DELETED_FILE   = 0            # Общее количество удаленных файлов
 TOTAL_DELETED_FOLDER = 0            # Общее количество удаленных папок
@@ -95,6 +96,24 @@ dirsFile = "dirs"                   #Файл с информацией о ди�
 nowTime = time.time()               #Получение текущего времени в секундах
 ageTime = nowTime - 60*60*24*DAYS   #Лимит в секундах после которого
                                     #условие неверно будет и файлы будут удаляться
+
+
+def check_condition(file_name):
+    """Проверка на критерии отбора файлов"""
+    if file_name[0:3] == 'in_' and file_name[-4:] == '.txt':
+        return True
+    elif file_name[0:4] == 'out_' and file_name[-4:] == '.txt':
+        return True
+    elif file_name[0:7] == 'changes' or file_name[-9:]=='.psupdate':
+        return True
+    else:
+        return False
+
+def log_clear():
+    """Очистка файла лога от предыдущих выполнений"""
+    nameFile = 'removed.log'
+    logFile = open(nameFile, mode='w', encoding='utf-8')
+    logFile.close()
 
 #С помощью os.walk реализовать модуль поиска директории и возврата списка директорий
 def Delete_Files(folder):
@@ -108,7 +127,7 @@ def Delete_Files(folder):
             fileName = os.path.join(path, file) # Получение полного пути к файлу с указанием имени файла
             fileDate = os.path.getmtime(fileName)
             if fileDate < ageTime:
-                if file[0:3] == 'in_' and file[-4:] == '.txt' or file[0:4] == 'out_' and file[-4:] == '.txt' or file[0:7] == 'changes':
+                if check_condition(file):
                     logFile.write(file + '\n')
                     sizeFile = os.path.getsize(fileName)
                     TOTAL_DELETED_SIZE += sizeFile # подсчитать размер удаленных файлов
@@ -117,17 +136,12 @@ def Delete_Files(folder):
     logFile.close()
 
 #=================MAIN====================
-startTime = time.asctime()
 
+startTime = time.asctime()      # Запись времени начало работы скрипта
+log_clear()
 for line in FOLDERS:
-    #print("LINE" + line)
     Delete_Files(line)   # Удаление старых файлов которые старше DAYS дней
-endTime = time.asctime()
 
-mailtext = "------------------------------------------------------------------------------------\n" \
-    + "START TIME:                                   " + str(startTime) + '\n' \
-    + "Количество удаленных файлов:                  " + str(TOTAL_DELETED_FILE) + " шт. \n" \
-    + "Размер освобожденного дискового пространства: " +str(round(TOTAL_DELETED_SIZE/1024/1024/1024,3)) + " Gb.\n" \
-    + "END TIME:                                     " + str(endTime) + '\n' \
-    + "-----------------------------------------------------------------------------------\n"
-clean_mail.CleanMail(mailtext)
+endTime = time.asctime()
+#Отправка данных об операциях на email
+mailsend.message_send(startTime, TOTAL_DELETED_FILE, TOTAL_DELETED_SIZE, endTime)

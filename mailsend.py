@@ -22,3 +22,14 @@ def CleanMail(body):
     server.login(addr_from, password)  # Получаем доступ
     server.sendmail(msg['From'], msg['To'], msg.as_string())  # Отправляем сообщение
     server.quit()
+
+
+def message_send(startTime, total_del_file, total_del_size, endTime):
+    mailtext = "------------------------------------------------------------------------------------\n" \
+               + "START TIME:                                   " + str(startTime) + '\n' \
+               + "Количество удаленных файлов:                  " + str(total_del_file) + " шт. \n" \
+               + "Размер освобожденного дискового пространства: " + str(
+        round(total_del_size / 1024 / 1024 / 1024, 3)) + " Gb.\n" \
+               + "END TIME:                                     " + str(endTime) + '\n' \
+               + "-----------------------------------------------------------------------------------\n"
+    CleanMail(mailtext)
