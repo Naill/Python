@@ -9,6 +9,7 @@ def CleanMail(body):
 
     addr_from = "stat@apt.by"  # Адресат
     addr_to = "penkrat.dm@gmail.com"  # Получатель
+    #В дальнейшем убрать пароль в файл или другой способ
     password = "nEP0lpwAXX"  # Пароль
 
     msg = MIMEText(body, 'plain', 'utf-8')
