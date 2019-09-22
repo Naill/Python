@@ -1,4 +1,4 @@
-from hero import HeroMelee
+from cleaner.hero import HeroMelee
 
 hero1 = HeroMelee(60, 5, 24, 'Human', 0)
 hero1.show_hero()

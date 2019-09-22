@@ -7,7 +7,7 @@
 
 import os
 import time
-import clean_mail
+from cleaner import clean_mail
 
 DAYS = 2
 FOLDERS = ["/var/www/clients/client2/web22/web/eshop/admin/DEBUG",
