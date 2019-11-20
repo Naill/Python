@@ -10,6 +10,7 @@ import time
 from cleaner import clean_mail
 
 DAYS = 2
+DAYS_DB = 10
 FOLDERS = ["/var/www/clients/client2/web22/web/eshop/admin/DEBUG",
             "/var/www/clients/client2/web20/web/eshop/admin/DEBUG",
             "/var/www/clients/client2/web42/web/eshop/admin/DEBUG",
@@ -86,14 +87,17 @@ FOLDERS = ["/var/www/clients/client2/web22/web/eshop/admin/DEBUG",
             "/var/www/clients/client2/web45/web/eshop_old/admin/FILES",
             "/var/www/clients/client2/web46/web/eshop/admin/FILES"
            ]
-TOTAL_DELETED_FILE   = 0            #Общее количество удаленных файлов
-TOTAL_DELETED_FOLDER = 0            #Общее количество удаленных папок
-TOTAL_DELETED_SIZE   = 0            #Размер удаленных файлов
+FOLDER_DB = "/var/sql/db"
+TOTAL_DELETED_FILE    = 0            #Общее количество удаленных файлов
+TOTAL_DELETED_FOLDER  = 0            #Общее количество удаленных папок
+TOTAL_DELETED_SIZE    = 0            #Размер удаленных файлов
+TOTAL_DELETED_SIZE_DB = 0
 
 #dirsFile = "dirs"                   #Файл с информацией о директориях для очистки мусора
 nowTime = time.time()               #Получение текущего времени в секундах
 ageTime = nowTime - 60*60*24*DAYS   #Лимит в секундах после которого
                                     #условие неверно будет и файлы будут удаляться
+ageTimeDb = nowTime - 60*60*24*DAYS_DB
 
 #С помощью os.walk реализовать модуль поиска директории и возврата списка директорий
 def Delete_Files(folder):
@@ -115,12 +119,30 @@ def Delete_Files(folder):
                     #os.remove(fileName)
     logFile.close()
 
+def Delete_DB(folder):
+    """Удаление бэкапов БД старше X DAYS"""
+    global TOTAL_DELETED_FILE
+    global TOTAL_DELETED_SIZE_DB
+    nameFile = 'removed.log'
+    logFile = open(nameFile, mode='w', encoding='utf-8')
+    for path, dirs, files in os.walk(folder):
+        for file in files:
+            fileName = os.path.join(path, file)  # Получение полного пути к файлу с указанием имени файла
+            fileDate = os.path.getmtime(fileName)
+            if fileDate < ageTimeDb:
+                logFile.write(file + '\n')
+                sizeFile = os.path.getsize(fileName)
+                TOTAL_DELETED_SIZE_DB += sizeFile  # подсчитать размер удаленных файлов
+                TOTAL_DELETED_FILE += 1  # Подсчитать количество удаленных файлов
+                #os.remove(fileName)
+    logFile.close()
 #=================MAIN====================
 startTime = time.asctime()
 
-for line in FOLDERS:
+#for line in FOLDERS:
     #print("LINE" + line)
-    Delete_Files(line)   # Удаление старых файлов которые старше DAYS дней
+ #   Delete_Files(line)   # Удаление старых файлов которые старше DAYS дней
+Delete_DB(FOLDER_DB)
 endTime = time.asctime()
 
 mailtext = "------------------------------------------------------------------------------------\n" \

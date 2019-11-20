@@ -4,8 +4,7 @@
 # using mysqldump and tar utility.
 #
 # Written by : Rahul Kumar
-# Website: http://tecadmin.net
-# Created date: Dec 03, 2013
+# Created date: DApr 03, 2019
 # Last modified: Aug 17, 2018
 # Tested with : Python 2.7.15 & Python 3.5
 # Script Revision: 1.4
@@ -23,8 +22,8 @@ import pipes
 # To take multiple databases backup, create any file like /backup/dbnames.txt and put databases names one on each line and assigned to DB_NAME variable.
 
 DB_HOST = 'localhost'
-DB_USER = 'root'
-DB_USER_PASSWORD = '_mysql_user_password_'
+DB_USER = 'backup'
+DB_USER_PASSWORD = 'xAzX9Jc9tKQCFp3C'
 # DB_NAME = '/backup/dbnameslist.txt'
 DB_NAME = 'db_name_to_backup'
 BACKUP_PATH = '/backup/dbbackup'
