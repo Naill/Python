@@ -7,9 +7,9 @@
 
 import os
 import time
-from cleaner import clean_mail
+import clean_mail
 
-DAYS = 2
+DAYS = 1
 DAYS_DB = 10
 FOLDERS = ["/var/www/clients/client2/web22/web/eshop/admin/DEBUG",
             "/var/www/clients/client2/web20/web/eshop/admin/DEBUG",
@@ -87,7 +87,7 @@ FOLDERS = ["/var/www/clients/client2/web22/web/eshop/admin/DEBUG",
             "/var/www/clients/client2/web45/web/eshop_old/admin/FILES",
             "/var/www/clients/client2/web46/web/eshop/admin/FILES"
            ]
-FOLDER_DB = "/var/sql/db"
+FOLDER_DB = '/var/sql/bd'
 TOTAL_DELETED_FILE    = 0            #Общее количество удаленных файлов
 TOTAL_DELETED_FOLDER  = 0            #Общее количество удаленных папок
 TOTAL_DELETED_SIZE    = 0            #Размер удаленных файлов
@@ -116,7 +116,7 @@ def Delete_Files(folder):
                     sizeFile = os.path.getsize(fileName)
                     TOTAL_DELETED_SIZE += sizeFile # подсчитать размер удаленных файлов
                     TOTAL_DELETED_FILE += 1        # Подсчитать количество удаленных файлов
-                    #os.remove(fileName)
+                    os.remove(fileName)
     logFile.close()
 
 def Delete_DB(folder):
@@ -124,8 +124,8 @@ def Delete_DB(folder):
     global TOTAL_DELETED_FILE
     global TOTAL_DELETED_SIZE_DB
     nameFile = 'removed.log'
-    logFile = open(nameFile, mode='w', encoding='utf-8')
-    for path, dirs, files in os.walk(folder):
+    logFile = open(nameFile, mode='a', encoding='utf-8')
+    for  path, dirs, files  in os.walk(folder):
         for file in files:
             fileName = os.path.join(path, file)  # Получение полного пути к файлу с указанием имени файла
             fileDate = os.path.getmtime(fileName)
@@ -134,21 +134,26 @@ def Delete_DB(folder):
                 sizeFile = os.path.getsize(fileName)
                 TOTAL_DELETED_SIZE_DB += sizeFile  # подсчитать размер удаленных файлов
                 TOTAL_DELETED_FILE += 1  # Подсчитать количество удаленных файлов
-                #os.remove(fileName)
+                os.remove(fileName)
     logFile.close()
 #=================MAIN====================
 startTime = time.asctime()
 
-#for line in FOLDERS:
-    #print("LINE" + line)
- #   Delete_Files(line)   # Удаление старых файлов которые старше DAYS дней
+for line in FOLDERS:
+    Delete_Files(line)   # Удаление старых файлов которые старше DAYS дней
+
 Delete_DB(FOLDER_DB)
+
 endTime = time.asctime()
+
+TOTAL_DELETED_SIZE += TOTAL_DELETED_SIZE_DB
 
 mailtext = "------------------------------------------------------------------------------------\n" \
     + "START TIME:                                   " + str(startTime) + '\n' \
     + "Количество удаленных файлов:                  " + str(TOTAL_DELETED_FILE) + " шт. \n" \
+    + "Размер удаленных бэкапов БД                 : " +str(round(TOTAL_DELETED_SIZE_DB/1024/1024/1024,3)) + " Gb.\n" \
     + "Размер освобожденного дискового пространства: " +str(round(TOTAL_DELETED_SIZE/1024/1024/1024,3)) + " Gb.\n" \
     + "END TIME:                                     " + str(endTime) + '\n' \
     + "-----------------------------------------------------------------------------------\n"
+
 clean_mail.CleanMail(mailtext)
